@@ -625,13 +625,27 @@ static void http_process_handler(uint8_t s, st_http_request * p_http_request)
 #endif
 				if(content_found && (file_len <= (DATA_BUF_SIZE-(strlen(RES_CGIHEAD_OK)+8))))
 				{
+					printf(p_http_request->URI);
 					send_http_response_cgi(s, pHTTP_TX, http_response, (uint16_t)file_len);
+					//printf("%d\n", file_len);
+					//printf("%d\n", strlen(RES_CGIHEAD_OK)+8);
+					printf("\n\n\n\n");
 
 					// Reset the H/W for apply to the change configuration information
 					if(content_found == HTTP_RESET) HTTPServer_ReStart();
 				}
 				else
 				{
+					//recv
+
+					//printf("%d\n", file_len);
+					//printf("bad\n");
+					uint8_t ddd[DATA_BUF_SIZE];
+					printf(p_http_request->URI);
+					printf("\n\n");
+					printf("%d\n\n", recv(s, ddd, DATA_BUF_SIZE));
+					printf(ddd);
+
 					send_http_response_header(s, PTYPE_CGI, 0, STATUS_NOT_FOUND);
 				}
 			}

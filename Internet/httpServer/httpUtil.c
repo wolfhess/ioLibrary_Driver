@@ -43,7 +43,7 @@ uint8_t http_post_cgi_handler(uint8_t * uri_name, st_http_request * p_http_reque
 	uint8_t ret = HTTP_OK;
 	uint16_t len = 0;
 	uint8_t val = 0;
-
+	char con_len[30];
 	if(predefined_set_cgi_processor(uri_name, p_http_request->URI, buf, &len))
 	{
 		;
@@ -51,8 +51,10 @@ uint8_t http_post_cgi_handler(uint8_t * uri_name, st_http_request * p_http_reque
 	else if(strcmp((const char *)uri_name, "example.cgi") == 0)
 	{
 		// To do
-		val = 1;
-		len = sprintf((char *)buf, "%d", val);
+		mid(p_http_request->URI, "Content-Length: ", "\r\n", con_len);
+		//printf(con_len);
+		//val = 1;
+		//len = sprintf((char *)buf, "%d", val);
 	}
 	else
 	{
@@ -60,7 +62,7 @@ uint8_t http_post_cgi_handler(uint8_t * uri_name, st_http_request * p_http_reque
 		ret = HTTP_FAILED;
 	}
 
-	if(ret)	*file_len = len;
+	if(ret)	*file_len = (uint32_t)strtoul(con_len, NULL, 10);
 	return ret;
 }
 
