@@ -625,27 +625,30 @@ static void http_process_handler(uint8_t s, st_http_request * p_http_request)
 #endif
 				if(content_found && (file_len <= (DATA_BUF_SIZE-(strlen(RES_CGIHEAD_OK)+8))))
 				{
-					printf(p_http_request->URI);
+#ifdef _HTTPSERVER_DEBUG_					
+					printf("%s", p_http_request->URI);
+#endif
 					send_http_response_cgi(s, pHTTP_TX, http_response, (uint16_t)file_len);
-					//printf("%d\n", file_len);
-					//printf("%d\n", strlen(RES_CGIHEAD_OK)+8);
-					printf("\n\n\n\n");
-
 					// Reset the H/W for apply to the change configuration information
 					if(content_found == HTTP_RESET) HTTPServer_ReStart();
 				}
 				else
 				{
-					//recv
-
-					//printf("%d\n", file_len);
-					//printf("bad\n");
-					uint8_t ddd[DATA_BUF_SIZE];
-					printf(p_http_request->URI);
-					printf("\n\n");
-					printf("%d\n\n", recv(s, ddd, DATA_BUF_SIZE));
-					printf(ddd);
-
+#ifdef _HTTPSERVER_DEBUG_
+					printf("%s", p_http_request->URI);
+#endif
+					uint8_t* data_recv = malloc(DATA_BUF_SIZE);
+					int32_t data_len;
+					for (;;){
+						data_len = recv(s, data_recv, DATA_BUF_SIZE);
+#ifdef _HTTPSERVER_DEBUG_
+						printf("%s", data_recv);
+#endif
+						memset(data_recv, 0, DATA_BUF_SIZE);
+						file_len = file_len - data_len;
+						if (file_len <= 0) break;
+					}
+					free(data_recv);
 					send_http_response_header(s, PTYPE_CGI, 0, STATUS_NOT_FOUND);
 				}
 			}
